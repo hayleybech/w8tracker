@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::post('weight-records', [WeightRecordController::class, 'store'])->name('weight-records.store');
+    Route::delete('weight-records/{weightRecord}', [WeightRecordController::class, 'destroy'])->name('weight-records.destroy');
 });
 
 require __DIR__.'/settings.php';

@@ -261,6 +261,7 @@ Wayfinder generates TypeScript functions for Laravel routes. Import from `@/acti
 - When the tests relating to your feature are passing, ask the user if they would like to also run the entire test suite to make sure everything is still passing.
 - Tests should cover all happy paths, failure paths, and edge cases.
 - You must not remove any tests or test files from the tests directory without approval. These are not temporary or helper files; these are core to the application.
+- You must write failing tests prior to writing code to ensure the tests fail as expected.
 
 ## Running Tests
 
