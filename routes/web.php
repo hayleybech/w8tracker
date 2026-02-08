@@ -13,7 +13,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('dashboard', [
+            'weightRecords' => auth()->user()->weightRecords()->latest('date')->latest('time')->get(),
+        ]);
     })->name('dashboard');
 
     Route::post('weight-records', [WeightRecordController::class, 'store'])->name('weight-records.store');
