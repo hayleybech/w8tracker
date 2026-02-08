@@ -152,19 +152,19 @@ export default function WeightChart({ records }: WeightChartProps) {
                                 type="date"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                className="h-8 w-32"
+                                className="h-8 w-38"
                             />
                             <span className="text-muted-foreground text-sm">to</span>
                             <Input
                                 type="date"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
-                                className="h-8 w-32"
+                                className="h-8 w-38"
                             />
                         </div>
                     )}
                     <Select value={viewMode} onValueChange={(value: ViewMode) => setViewMode(value)}>
-                        <SelectTrigger className="h-8 w-[120px]">
+                        <SelectTrigger className="h-8 w-[150px]">
                             <SelectValue placeholder="Select view" />
                         </SelectTrigger>
                         <SelectContent>
