@@ -41,11 +41,23 @@ export default function WeightChart({ records }: WeightChartProps) {
             dailyDataMap.set(dateStr, Number(record.weight_kg));
         });
 
-        // Convert map back to array for Recharts
-        return Array.from(dailyDataMap.entries()).map(([date, weight]) => ({
-            date,
-            weight,
-        }));
+        // Convert map back to array for Recharts, filling in missing days
+        const dates = Array.from(dailyDataMap.keys()).sort();
+        if (dates.length === 0) return [];
+
+        const startDate = new Date(dates[0]);
+        const endDate = new Date(dates[dates.length - 1]);
+        const data = [];
+
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const dateStr = d.toISOString().substring(0, 10);
+            data.push({
+                date: dateStr,
+                weight: dailyDataMap.get(dateStr) ?? null,
+            });
+        }
+
+        return data;
     }, [records]);
 
     if (chartData.length === 0) {
@@ -100,6 +112,7 @@ export default function WeightChart({ records }: WeightChartProps) {
                                 fillOpacity={1}
                                 fill="url(#colorWeight)"
                                 strokeWidth={2}
+                                connectNulls
                             />
                         </AreaChart>
                     </ResponsiveContainer>
