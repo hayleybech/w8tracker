@@ -36,7 +36,7 @@ class WeightRecordPolicy
      */
     public function update(User $user, WeightRecord $weightRecord): bool
     {
-        return false;
+        return $user->id === $weightRecord->user_id;
     }
 
     /**

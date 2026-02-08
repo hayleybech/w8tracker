@@ -1,8 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useForm } from '@inertiajs/react';
-import { Trash2 } from 'lucide-react';
-import {destroy} from "@/routes/weight-records";
+import { Trash2, Edit2 } from 'lucide-react';
+import { destroy } from "@/routes/weight-records";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import WeightRecordForm from './weight-record-form';
 
 interface WeightRecord {
     id: number;
@@ -18,6 +21,7 @@ interface WeightRecordListProps {
 
 export default function WeightRecordList({ records }: WeightRecordListProps) {
     const form = useForm();
+    const [editingRecord, setEditingRecord] = useState<WeightRecord | null>(null);
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this record?')) {
@@ -60,16 +64,28 @@ export default function WeightRecordList({ records }: WeightRecordListProps) {
                                     <td className="px-4 py-3">{record.time.substring(0, 5)}</td>
                                     <td className="px-4 py-3 text-right font-mono">{record.weight_kg}</td>
                                     <td className="px-4 py-3 text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(record.id)}
-                                            disabled={form.processing}
-                                            className="text-neutral-400 hover:text-destructive"
-                                        >
-                                            <Trash2 className="size-4" />
-                                            <span className="sr-only">Delete</span>
-                                        </Button>
+                                        <div className="flex justify-end gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setEditingRecord(record)}
+                                                disabled={form.processing}
+                                                className="text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+                                            >
+                                                <Edit2 className="size-4" />
+                                                <span className="sr-only">Edit</span>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDelete(record.id)}
+                                                disabled={form.processing}
+                                                className="text-neutral-400 hover:text-destructive"
+                                            >
+                                                <Trash2 className="size-4" />
+                                                <span className="sr-only">Delete</span>
+                                            </Button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -77,6 +93,21 @@ export default function WeightRecordList({ records }: WeightRecordListProps) {
                     </table>
                 </div>
             </CardContent>
+
+            <Dialog open={!!editingRecord} onOpenChange={(open) => !open && setEditingRecord(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Weight Record</DialogTitle>
+                        <DialogDescription>Update your weight details below.</DialogDescription>
+                    </DialogHeader>
+                    {editingRecord && (
+                        <WeightRecordForm
+                            record={editingRecord}
+                            onSuccess={() => setEditingRecord(null)}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }
