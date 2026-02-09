@@ -129,7 +129,10 @@ export default function WeightChart({ records }: WeightChartProps) {
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     };
 
-    const formatTooltipLabel = (label: string) => {
+    const formatTooltipLabel = (label: React.ReactNode) => {
+        if (typeof label !== 'string') {
+            return label;
+        }
         const date = new Date(label);
         if (viewMode === 'year') return date.getFullYear().toString();
         if (viewMode === 'month') return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
@@ -207,7 +210,7 @@ export default function WeightChart({ records }: WeightChartProps) {
                                 <Tooltip
                                     labelFormatter={formatTooltipLabel}
                                     contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                                    formatter={(value: number) => [Number(value).toFixed(1) + ' kg', 'Weight']}
+                                    formatter={(value: number | undefined) => [value !== undefined ? Number(value).toFixed(1) + ' kg' : 'N/A', 'Weight']}
                                 />
                                 <Area
                                     type="monotone"

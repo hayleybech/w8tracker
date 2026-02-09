@@ -25,7 +25,7 @@ export default function WeightRecordList({ records }: WeightRecordListProps) {
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this record?')) {
-            form.delete(destroy(id));
+            form.delete(destroy(id).url);
         }
     };
 
