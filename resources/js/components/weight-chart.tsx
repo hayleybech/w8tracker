@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
 import {
-    LineChart,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
@@ -11,8 +9,8 @@ import {
     AreaChart,
 } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface WeightRecord {
     id: number;
@@ -164,7 +162,7 @@ export default function WeightChart({ records }: WeightChartProps) {
                         </div>
                     )}
                     <Select value={viewMode} onValueChange={(value: ViewMode) => setViewMode(value)}>
-                        <SelectTrigger className="h-8 w-[150px]">
+                        <SelectTrigger className="h-8 w-38">
                             <SelectValue placeholder="Select view" />
                         </SelectTrigger>
                         <SelectContent>
@@ -179,12 +177,12 @@ export default function WeightChart({ records }: WeightChartProps) {
             </CardHeader>
             <CardContent>
                 {chartData.length === 0 ? (
-                    <div className="flex h-[300px] items-center justify-center text-muted-foreground">
+                    <div className="flex h-75 items-center justify-center text-muted-foreground">
                         No data available for the selected period.
                     </div>
                 ) : (
-                    <div className="h-[300px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="h-75 w-full">
+                        <ResponsiveContainer width="100%" height={300}>
                             <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
