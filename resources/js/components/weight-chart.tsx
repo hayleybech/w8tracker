@@ -141,13 +141,18 @@ export default function WeightChart({ records }: WeightChartProps) {
 
     return (
         <Card className="col-span-full">
-            <CardHeader className="flex sm:items-center justify-between space-y-0 pb-7 flex-col items-start sm:flex-row">
+            <CardHeader className="flex flex-col items-start justify-between space-y-0 pb-7 sm:flex-row sm:items-center">
                 <div>
                     <CardTitle>Weight Progress</CardTitle>
-                    <CardDescription>Your weight trend over time.</CardDescription>
+                    <CardDescription>
+                        Your weight trend over time.
+                    </CardDescription>
                 </div>
-                <div className="flex flex-col items-start sm:items-end gap-2">
-                    <Select value={viewMode} onValueChange={(value: ViewMode) => setViewMode(value)}>
+                <div className="flex flex-col items-start gap-2 sm:items-end">
+                    <Select
+                        value={viewMode}
+                        onValueChange={(value: ViewMode) => setViewMode(value)}
+                    >
                         <SelectTrigger className="h-8 w-38">
                             <SelectValue placeholder="Select view" />
                         </SelectTrigger>
@@ -161,7 +166,7 @@ export default function WeightChart({ records }: WeightChartProps) {
                     </Select>
 
                     {viewMode === 'custom' && (
-                        <div className="flex items-center sm:justify-end gap-2 flex-wrap">
+                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                             <Input
                                 name="startDate"
                                 type="date"
@@ -169,8 +174,10 @@ export default function WeightChart({ records }: WeightChartProps) {
                                 onChange={(e) => setStartDate(e.target.value)}
                                 className="h-8 w-34.5 text-sm"
                             />
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-muted-foreground text-sm">to</span>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-sm text-muted-foreground">
+                                    to
+                                </span>
                                 <Input
                                     name="endDate"
                                     type="date"
@@ -191,14 +198,39 @@ export default function WeightChart({ records }: WeightChartProps) {
                 ) : (
                     <div className="h-75 w-full">
                         <ResponsiveContainer width="100%" height={300}>
-                            <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <AreaChart
+                                data={chartData}
+                                margin={{
+                                    top: 10,
+                                    right: 0,
+                                    left: -20,
+                                    bottom: 0,
+                                }}
+                            >
                                 <defs>
-                                    <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1}/>
-                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                                    <linearGradient
+                                        id="colorWeight"
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="1"
+                                    >
+                                        <stop
+                                            offset="5%"
+                                            stopColor="#2563eb"
+                                            stopOpacity={0.1}
+                                        />
+                                        <stop
+                                            offset="95%"
+                                            stopColor="#2563eb"
+                                            stopOpacity={0}
+                                        />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                />
                                 <XAxis
                                     dataKey="date"
                                     tickFormatter={formatXAxis}
@@ -214,8 +246,25 @@ export default function WeightChart({ records }: WeightChartProps) {
                                 />
                                 <Tooltip
                                     labelFormatter={formatTooltipLabel}
-                                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                                    formatter={(value: number | undefined) => [value !== undefined ? Number(value).toFixed(1) + ' kg' : 'N/A', 'Weight']}
+                                    labelStyle={{
+                                        fontSize: 'var(--text-xs)',
+                                        color: 'var(--foreground)',
+                                        fontWeight: 'bold',
+                                    }}
+                                    itemStyle={{ color: 'var(--foreground)', fontSize: 'var(--text-xs)' }}
+                                    contentStyle={{
+                                        borderRadius: '5px',
+                                        border: '1px solid var(--muted-foreground)',
+                                        padding: '5px 8px',
+                                        lineHeight: '1.2em',
+                                        backgroundColor: 'var(--muted)',
+                                    }}
+                                    formatter={(value: number | undefined) => [
+                                        value !== undefined
+                                            ? Number(value).toFixed(1) + ' kg'
+                                            : 'N/A',
+                                        'Weight',
+                                    ]}
                                 />
                                 <Area
                                     type="monotone"
