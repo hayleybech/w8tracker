@@ -141,29 +141,12 @@ export default function WeightChart({ records }: WeightChartProps) {
 
     return (
         <Card className="col-span-full">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-7">
+            <CardHeader className="flex sm:items-center justify-between space-y-0 pb-7 flex-col items-start sm:flex-row">
                 <div>
                     <CardTitle>Weight Progress</CardTitle>
                     <CardDescription>Your weight trend over time.</CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
-                    {viewMode === 'custom' && (
-                        <div className="flex items-center gap-2 mr-2">
-                            <Input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="h-8 w-38"
-                            />
-                            <span className="text-muted-foreground text-sm">to</span>
-                            <Input
-                                type="date"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="h-8 w-38"
-                            />
-                        </div>
-                    )}
+                <div className="flex flex-col items-start sm:items-end gap-2">
                     <Select value={viewMode} onValueChange={(value: ViewMode) => setViewMode(value)}>
                         <SelectTrigger className="h-8 w-38">
                             <SelectValue placeholder="Select view" />
@@ -176,6 +159,28 @@ export default function WeightChart({ records }: WeightChartProps) {
                             <SelectItem value="custom">Custom Range</SelectItem>
                         </SelectContent>
                     </Select>
+
+                    {viewMode === 'custom' && (
+                        <div className="flex items-center sm:justify-end gap-2 flex-wrap">
+                            <Input
+                                name="startDate"
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="h-8 w-34.5 text-sm"
+                            />
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-muted-foreground text-sm">to</span>
+                                <Input
+                                    name="endDate"
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="h-8 w-34.5 text-sm"
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </CardHeader>
             <CardContent>
