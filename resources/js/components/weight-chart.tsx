@@ -1,23 +1,10 @@
 import { useMemo, useState } from 'react';
-import {
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Area,
-    AreaChart,
-} from 'recharts';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-interface WeightRecord {
-    id: number;
-    date: string;
-    time: string;
-    weight_kg: string | number;
-}
+import { type WeightRecord } from '@/types';
 
 interface WeightChartProps {
     records: WeightRecord[];
@@ -31,7 +18,9 @@ export default function WeightChart({ records }: WeightChartProps) {
     const [endDate, setEndDate] = useState<string>('');
 
     const chartData = useMemo(() => {
-        if (!records || records.length === 0) return [];
+        if (!records || records.length === 0) {
+            return [];
+        }
 
         // Sort records by date and time ascending
         const sortedRecords = [...records].sort((a, b) => {
@@ -40,62 +29,67 @@ export default function WeightChart({ records }: WeightChartProps) {
             return dateA.getTime() - dateB.getTime();
         });
 
-        let filteredRecords = sortedRecords;
         const now = new Date();
+        let filteredRecords = sortedRecords;
 
         if (viewMode === 'day') {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(now.getDate() - 30);
-            filteredRecords = sortedRecords.filter(r => new Date(r.date) >= thirtyDaysAgo);
+            filteredRecords = sortedRecords.filter((r) => new Date(r.date) >= thirtyDaysAgo);
         } else if (viewMode === 'month') {
             const oneYearAgo = new Date();
             oneYearAgo.setFullYear(now.getFullYear() - 1);
-            filteredRecords = sortedRecords.filter(r => new Date(r.date) >= oneYearAgo);
-        } else if (viewMode === 'year') {
-            // No additional filter for year, show all but aggregate by year later
+            filteredRecords = sortedRecords.filter((r) => new Date(r.date) >= oneYearAgo);
         } else if (viewMode === 'custom') {
-            if (startDate) filteredRecords = filteredRecords.filter(r => r.date >= startDate);
-            if (endDate) filteredRecords = filteredRecords.filter(r => r.date <= endDate);
+            if (startDate) {
+                filteredRecords = filteredRecords.filter((r) => r.date >= startDate);
+            }
+            if (endDate) {
+                filteredRecords = filteredRecords.filter((r) => r.date <= endDate);
+            }
         }
 
-        if (filteredRecords.length === 0) return [];
+        if (filteredRecords.length === 0) {
+            return [];
+        }
 
-        if (viewMode === 'month') {
-            const monthlyDataMap = new Map<string, { total: number, count: number }>();
-            filteredRecords.forEach((record) => {
-                const monthStr = record.date.substring(0, 7); // YYYY-MM
-                const current = monthlyDataMap.get(monthStr) || { total: 0, count: 0 };
-                monthlyDataMap.set(monthStr, {
+        const aggregateData = (records: WeightRecord[], keyFn: (r: WeightRecord) => string, dateFn: (key: string) => number) => {
+            const dataMap = new Map<string, { total: number; count: number }>();
+            records.forEach((record) => {
+                const key = keyFn(record);
+                const current = dataMap.get(key) || { total: 0, count: 0 };
+                dataMap.set(key, {
                     total: current.total + Number(record.weight_kg),
-                    count: current.count + 1
+                    count: current.count + 1,
                 });
             });
 
-            return Array.from(monthlyDataMap.entries()).map(([date, data]) => ({
-                date: new Date(date + '-01T00:00:00').getTime(),
-                weight: data.total / data.count,
-            })).sort((a, b) => a.date - b.date);
+            return Array.from(dataMap.entries())
+                .map(([key, data]) => ({
+                    date: dateFn(key),
+                    weight: data.total / data.count,
+                }))
+                .sort((a, b) => a.date - b.date);
+        };
+
+        if (viewMode === 'month') {
+            return aggregateData(
+                filteredRecords,
+                (r) => r.date.substring(0, 7), // YYYY-MM
+                (key) => new Date(`${key}-01T00:00:00`).getTime(),
+            );
         }
 
         if (viewMode === 'year') {
-            const yearlyDataMap = new Map<string, { total: number, count: number }>();
-            filteredRecords.forEach((record) => {
-                const yearStr = record.date.substring(0, 4); // YYYY
-                const current = yearlyDataMap.get(yearStr) || { total: 0, count: 0 };
-                yearlyDataMap.set(yearStr, {
-                    total: current.total + Number(record.weight_kg),
-                    count: current.count + 1
-                });
-            });
-
-            return Array.from(yearlyDataMap.entries()).map(([date, data]) => ({
-                date: new Date(date + '-01-01T00:00:00').getTime(),
-                weight: data.total / data.count,
-            })).sort((a, b) => a.date - b.date);
+            return aggregateData(
+                filteredRecords,
+                (r) => r.date.substring(0, 4), // YYYY
+                (key) => new Date(`${key}-01-01T00:00:00`).getTime(),
+            );
         }
 
         // Daily or Custom/All (Daily points)
-        return filteredRecords.map(record => ({
+        return filteredRecords.map((record) => ({
             date: new Date(`${record.date.substring(0, 10)}T${record.time}`).getTime(),
             weight: Number(record.weight_kg),
         }));
@@ -187,29 +181,12 @@ export default function WeightChart({ records }: WeightChartProps) {
                                 }}
                             >
                                 <defs>
-                                    <linearGradient
-                                        id="colorWeight"
-                                        x1="0"
-                                        y1="0"
-                                        x2="0"
-                                        y2="1"
-                                    >
-                                        <stop
-                                            offset="5%"
-                                            stopColor="#2563eb"
-                                            stopOpacity={0.1}
-                                        />
-                                        <stop
-                                            offset="95%"
-                                            stopColor="#2563eb"
-                                            stopOpacity={0}
-                                        />
+                                    <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--color-chart-main)" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="var(--color-chart-main)" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid
-                                    strokeDasharray="3 3"
-                                    vertical={false}
-                                />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
                                 <XAxis
                                     dataKey="date"
                                     tickFormatter={formatXAxis}
@@ -219,39 +196,41 @@ export default function WeightChart({ records }: WeightChartProps) {
                                     type="number"
                                     domain={['dataMin', 'dataMax']}
                                     scale="time"
+                                    stroke="var(--color-muted-foreground)"
                                 />
                                 <YAxis
                                     fontSize={12}
                                     tickLine={false}
                                     axisLine={false}
                                     domain={['dataMin - 5', 'dataMax + 5']}
+                                    stroke="var(--color-muted-foreground)"
+                                    tickFormatter={(value) => `${value} kg`}
                                 />
                                 <Tooltip
                                     labelFormatter={formatTooltipLabel}
                                     labelStyle={{
-                                        fontSize: 'var(--text-xs)',
-                                        color: 'var(--foreground)',
+                                        fontSize: '12px',
+                                        color: 'var(--color-foreground)',
                                         fontWeight: 'bold',
                                     }}
-                                    itemStyle={{ color: 'var(--foreground)', fontSize: 'var(--text-xs)' }}
+                                    itemStyle={{ color: 'var(--color-foreground)', fontSize: '12px' }}
                                     contentStyle={{
-                                        borderRadius: '5px',
-                                        border: '1px solid var(--muted-foreground)',
-                                        padding: '5px 8px',
+                                        borderRadius: 'var(--radius-md)',
+                                        border: '1px solid var(--color-border)',
+                                        padding: '8px',
                                         lineHeight: '1.2em',
-                                        backgroundColor: 'var(--muted)',
+                                        backgroundColor: 'var(--color-card)',
+                                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                     }}
                                     formatter={(value: number | undefined) => [
-                                        value !== undefined
-                                            ? Number(value).toFixed(1) + ' kg'
-                                            : 'N/A',
+                                        value !== undefined ? Number(value).toFixed(1) + ' kg' : 'N/A',
                                         'Weight',
                                     ]}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="weight"
-                                    stroke="#2563eb"
+                                    stroke="var(--color-chart-main)"
                                     fillOpacity={1}
                                     fill="url(#colorWeight)"
                                     strokeWidth={2}

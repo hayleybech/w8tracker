@@ -1,10 +1,11 @@
 import { Head } from '@inertiajs/react';
+
 import WeightChart from '@/components/weight-chart';
 import WeightRecordForm from '@/components/weight-record-form';
 import WeightRecordList from '@/components/weight-record-list';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import type { BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type WeightRecord } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,14 +13,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: dashboard().url,
     },
 ];
-
-interface WeightRecord {
-    id: number;
-    date: string;
-    time: string;
-    weight_kg: string | number;
-    created_at: string;
-}
 
 interface DashboardProps {
     weightRecords: WeightRecord[];

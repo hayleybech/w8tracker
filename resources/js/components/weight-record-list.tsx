@@ -1,19 +1,14 @@
 import { useForm } from '@inertiajs/react';
-import { Trash2, Edit2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { destroy } from "@/routes/weight-records";
-import WeightRecordForm from './weight-record-form';
+import { destroy } from '@/routes/weight-records';
+import { type WeightRecord } from '@/types';
 
-interface WeightRecord {
-    id: number;
-    date: string;
-    time: string;
-    weight_kg: string | number;
-    created_at: string;
-}
+import WeightRecordForm from './weight-record-form';
 
 interface WeightRecordListProps {
     records: WeightRecord[];

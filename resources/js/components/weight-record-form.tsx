@@ -1,18 +1,13 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { type FormEventHandler } from 'react';
+
+import { store, update } from '@/actions/App/Http/Controllers/WeightRecordController';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import InputError from '@/components/input-error';
-import { store, update } from '@/actions/App/Http/Controllers/WeightRecordController';
-
-interface WeightRecord {
-    id: number;
-    date: string;
-    time: string;
-    weight_kg: string | number;
-}
+import { type WeightRecord } from '@/types';
 
 interface WeightRecordFormProps {
     record?: WeightRecord;
