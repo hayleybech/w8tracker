@@ -72,9 +72,9 @@ export default function WeightChart({ records }: WeightChartProps) {
             });
 
             return Array.from(monthlyDataMap.entries()).map(([date, data]) => ({
-                date,
+                date: new Date(date + '-01T00:00:00').getTime(),
                 weight: data.total / data.count,
-            })).sort((a, b) => a.date.localeCompare(b.date));
+            })).sort((a, b) => a.date - b.date);
         }
 
         if (viewMode === 'year') {
@@ -89,54 +89,33 @@ export default function WeightChart({ records }: WeightChartProps) {
             });
 
             return Array.from(yearlyDataMap.entries()).map(([date, data]) => ({
-                date,
+                date: new Date(date + '-01-01T00:00:00').getTime(),
                 weight: data.total / data.count,
-            })).sort((a, b) => a.date.localeCompare(b.date));
+            })).sort((a, b) => a.date - b.date);
         }
 
         // Daily or Custom/All (Daily points)
-        const dailyDataMap = new Map<string, number>();
-        filteredRecords.forEach((record) => {
-            const dateStr = record.date.substring(0, 10);
-            dailyDataMap.set(dateStr, Number(record.weight_kg));
-        });
-
-        const dates = Array.from(dailyDataMap.keys()).sort();
-        if (dates.length === 0) return [];
-
-        const start = new Date(dates[0]);
-        const end = new Date(dates[dates.length - 1]);
-        const data = [];
-
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-            const dateStr = d.toISOString().substring(0, 10);
-            const weight = dailyDataMap.get(dateStr);
-            if (weight !== undefined || viewMode === 'day' || viewMode === 'custom') {
-                 data.push({
-                    date: dateStr,
-                    weight: weight ?? null,
-                });
-            }
-        }
-
-        return data;
+        return filteredRecords.map(record => ({
+            date: new Date(`${record.date.substring(0, 10)}T${record.time}`).getTime(),
+            weight: Number(record.weight_kg),
+        }));
     }, [records, viewMode, startDate, endDate]);
 
-    const formatXAxis = (str: string) => {
-        const date = new Date(str);
+    const formatXAxis = (timestamp: number) => {
+        const date = new Date(timestamp);
         if (viewMode === 'year') return date.getFullYear().toString();
         if (viewMode === 'month') return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     };
 
-    const formatTooltipLabel = (label: React.ReactNode) => {
-        if (typeof label !== 'string') {
-            return label;
-        }
-        const date = new Date(label);
+    const formatTooltipLabel = (label: string | number) => {
+        const timestamp = typeof label === 'number' ? label : Number(label);
+        if (isNaN(timestamp)) return label;
+
+        const date = new Date(timestamp);
         if (viewMode === 'year') return date.getFullYear().toString();
         if (viewMode === 'month') return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-        return date.toLocaleDateString();
+        return date.toLocaleString();
     };
 
     return (
@@ -237,6 +216,9 @@ export default function WeightChart({ records }: WeightChartProps) {
                                     fontSize={12}
                                     tickLine={false}
                                     axisLine={false}
+                                    type="number"
+                                    domain={['dataMin', 'dataMax']}
+                                    scale="time"
                                 />
                                 <YAxis
                                     fontSize={12}
