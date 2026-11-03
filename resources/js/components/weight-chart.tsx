@@ -169,14 +169,14 @@ export default function WeightChart({ records }: WeightChartProps) {
                         No data available for the selected period.
                     </div>
                 ) : (
-                    <div className="h-75 w-full">
+                    <div className="h-75 w-full pl-2">
                         <ResponsiveContainer width="100%" height={300}>
                             <AreaChart
                                 data={chartData}
                                 margin={{
                                     top: 10,
                                     right: 0,
-                                    left: -20,
+                                    left: -0,
                                     bottom: 0,
                                 }}
                             >
@@ -202,9 +202,10 @@ export default function WeightChart({ records }: WeightChartProps) {
                                     fontSize={12}
                                     tickLine={false}
                                     axisLine={false}
-                                    domain={['dataMin - 5', 'dataMax + 5']}
+                                    domain={[dataMin => (Math.floor(dataMin / 10) * 10), dataMax => (Math.ceil(dataMax / 10) * 10)]}
                                     stroke="var(--color-muted-foreground)"
                                     tickFormatter={(value) => `${value} kg`}
+                                    niceTicks="snap125"
                                 />
                                 <Tooltip
                                     labelFormatter={formatTooltipLabel}
